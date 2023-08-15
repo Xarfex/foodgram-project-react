@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
@@ -95,6 +96,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             'ingredients', 'tags', 'cooking_time',
         )
 
+    @transaction.atomic(durable=True)
     def create(self, validated_data):
         ingredients_data = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
@@ -110,17 +112,18 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
                 )
             ingredients_set.add(ingredient['id'])
         recipe = Recipe.objects.create(**validated_data)
+        recipes_ingredients = []
         for ingredient in ingredients_data:
-            amount = ingredient['amount']
-            id = ingredient['id']
-            AddIngredientInRec.objects.create(
-                ingredient=get_object_or_404(Ingredients, id=id),
-                recipe=recipe, amount=amount
+            recipes_ingredients.append(
+                ingredient=Ingredients.objects.get(id=ingredient['id']),
+                recipe=recipe, amount=ingredient['amount']
             )
+        AddIngredientInRec.objects.bulk_create(recipes_ingredients)
         for tag in tags_data:
             recipe.tags.add(tag)
         return recipe
 
+    @transaction.atomic(durable=True)
     def update(self, instance, validated_data):
         ingredients_data = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')

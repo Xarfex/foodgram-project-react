@@ -8,8 +8,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.viewsets import (GenericViewSet,
-                                     ReadOnlyModelViewSet, mixins)
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from .serializers import (TagSerializer, IngredientReadSerializer,
                           FavoriteRecipeSerializer, RecipeReadSerializer,
@@ -20,6 +19,7 @@ from .models import (Ingredients, Recipe, ShoppingList, Tag,
                      AddIngredientInRec, FavoriteRecipe)
 from .pagination import CustomPageSizePagination
 from .permissions import AuthPostRetrieve, IsAuthorOrReadOnly
+import api.constants as c
 
 
 class TagViewSet(ReadOnlyModelViewSet):
@@ -38,14 +38,7 @@ class IngredientsViewSet(ReadOnlyModelViewSet):
     filterset_class = IngredientNameFilter
 
 
-class RecipeViewSet(
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin,
-    mixins.RetrieveModelMixin,
-    mixins.DestroyModelMixin,
-    mixins.UpdateModelMixin,
-    GenericViewSet
-):
+class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all().order_by('-id')
     permission_classes = [AuthPostRetrieve, IsAuthorOrReadOnly]
     pagination_class = CustomPageSizePagination
@@ -75,10 +68,8 @@ class RecipeViewSet(
             data=data,
             context={'request': request}
         )
-        if (
-            request.method == 'POST'
-            and serializer.is_valid()
-        ):
+        serializer.is_valid(raise_exception=True)
+        if request.method == 'POST':
             FavoriteRecipe.objects.create(user=user, recipe=recipe)
             serializer = FavoriteRecipeSerializer(
                 recipe,
@@ -89,14 +80,9 @@ class RecipeViewSet(
                 status=status.HTTP_201_CREATED
             )
 
-        if (
-            request.method == 'DELETE'
-            and serializer.is_valid()
-        ):
+        if request.method == 'DELETE':
             FavoriteRecipe.objects.filter(user=user, recipe=recipe).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @action(detail=True,
             methods=['post', 'delete'],
@@ -112,10 +98,8 @@ class RecipeViewSet(
             data=data,
             context={'request': request}
         )
-        if (
-            request.method == 'POST'
-            and serializer.is_valid()
-        ):
+        serializer.is_valid(raise_exception=True)
+        if request.method == 'POST':
             ShoppingList.objects.create(user=user, recipe=recipe)
             serializer = FavoriteRecipeSerializer(
                 recipe,
@@ -125,15 +109,9 @@ class RecipeViewSet(
                 data=serializer.data,
                 status=status.HTTP_201_CREATED
             )
-
-        if (
-            request.method == 'DELETE'
-            and serializer.is_valid()
-        ):
+        if request.method == 'DELETE':
             ShoppingList.objects.filter(user=user, recipe=recipe).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @action(
         detail=False,
@@ -158,9 +136,9 @@ class RecipeViewSet(
                     }
                 else:
                     shopping_list[name]['amount'] += amount
-        file_name = 'Shopping_list'
-        doc_title = 'Recipes in the shopping list'
-        title = 'Shopping list'
+        file_name = c.FILE_NAME
+        doc_title = c.DOC_TITLE
+        title = c.TITLE
         sub_title = f'{timezone.now().date()}'
         response = HttpResponse(content_type='application/pdf')
         content_disposition = f'attachment; filename="{file_name}.pdf"'
@@ -168,12 +146,12 @@ class RecipeViewSet(
         pdf = canvas.Canvas(response)
         pdf.setTitle(doc_title)
         pdfmetrics.registerFont(TTFont('Dej', 'DejaVuSans.ttf'))
-        pdf.setFont('Dej', 24)
-        pdf.drawCentredString(300, 770, title)
-        pdf.setFont('Dej', 16)
-        pdf.drawCentredString(290, 720, sub_title)
-        pdf.line(30, 710, 565, 710)
-        height = 670
+        pdf.setFont('Dej', c.FONT_SIZE_TITLE)
+        pdf.drawCentredString(c.X_FOR_TITLE, c.Y_FOR_TITLE, title)
+        pdf.setFont('Dej', c.FONT_SIZE_SUB_TITLE)
+        pdf.drawCentredString(c.X_FOR_SUB_TITLE, c.Y_FOR_SUB_TITLE, sub_title)
+        pdf.line(c.X1, c.Y1, c.X2, c.Y2)
+        height = c.Y_FOR_INGREDIENTS
         for name, data in shopping_list.items():
             pdf.drawString(
                 50,

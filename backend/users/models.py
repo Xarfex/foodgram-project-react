@@ -13,12 +13,10 @@ class User(AbstractUser):
         'login',
         max_length=100,
         unique=True,
-        null=True
     )
     password = models.CharField(
         'password',
         max_length=100,
-        null=True
     )
     first_name = models.CharField(
         'first name',

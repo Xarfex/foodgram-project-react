@@ -14,8 +14,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         with open(BASE_DIR / 'data/ingredients.json') as file:
             data = json.load(file)
-            for row in data:
-                Ingredients.objects.create(
+            Ingredients.objects.bulk_create(
+                Ingredients(
                     name=row['name'],
-                    measurement_unit=row['measurement_unit'],
+                    measurement_unit=row['measurement_unit']
                 )
+                for row in data
+            )

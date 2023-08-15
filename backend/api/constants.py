@@ -1,0 +1,15 @@
+FILE_NAME = 'Shopping_list'
+DOC_TITLE = 'Recipes in the shopping list'
+TITLE = 'Shopping list'
+
+FONT_SIZE_TITLE = 24
+FONT_SIZE_SUB_TITLE = 16
+X_FOR_TITLE = 300
+Y_FOR_TITLE = 770
+X_FOR_SUB_TITLE = 290
+Y_FOR_SUB_TITLE = 720
+X1 = 30
+Y1 = 710
+X2 = 565
+Y2 = 710
+Y_FOR_INGREDIENTS = 670

@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from colorfield.fields import ColorField
 
 User = get_user_model()
 
@@ -33,8 +35,7 @@ class Tag(models.Model):
         unique=True,
         verbose_name='Тег',
     )
-    color = models.CharField(
-        max_length=7,
+    color = ColorField(
         default='#ff0000',
         verbose_name='Цвет',
     )
@@ -105,6 +106,12 @@ class Recipe(models.Model):
     cooking_time = models.PositiveSmallIntegerField(
         default=1,
         verbose_name='Время приготовления',
+        validators=[
+            MinValueValidator(limit_value=1,
+                              message='Minimum cooking time is 1'),
+            MaxValueValidator(limit_value=1000,
+                              message='Too much time for cooking'),
+        ]
     )
 
     class Meta:
@@ -128,7 +135,14 @@ class AddIngredientInRec(models.Model):
         related_name='amounts',
         verbose_name='Рецепт',
     )
-    amount = models.PositiveIntegerField()
+    amount = models.PositiveIntegerField(
+        validators=[
+            MinValueValidator(limit_value=1,
+                              message='You can not add less then 1'),
+            MaxValueValidator(limit_value=1000,
+                              message='You can not add more then 1000'),
+        ]
+    )
 
     class Meta:
         verbose_name = 'Количество ингредиента'
