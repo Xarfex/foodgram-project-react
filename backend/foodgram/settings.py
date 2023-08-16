@@ -14,7 +14,7 @@ SECRET_KEY = os.getenv('TOKEN', 'NONTOKEN')
 
 DEBUG = os.getenv('DEBUG', False)
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'host.docker.internal', 'backend', ]
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '158.160.8.184', 'valeryanichx.hopto.org']
 
 
 INSTALLED_APPS = [
