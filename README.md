@@ -1,6 +1,10 @@
 # Foodgram
 ![Xarfex](https://github.com/Xarfex/foodgram-project-react/actions/workflows/main.yml/badge.svg)
 
+## Адрес
+```https://valeryanichx.hopto.org```
+```Superuser: login: testuser@mail.ru password: testpass```
+
 ## Что это такое
 - Данный проект - это возможность посмотреть на всякую вкуснятину
 - Можно делиться своими или семейными рецептами
@@ -10,9 +14,6 @@
 ## Инструментарий
 - *Языки*: Python, HTML, CSS, JavaScript, Django, React, YAML-словарь
 - *Сервисы*: Nginx, Workflow, GitHub Actions(CI/CD), Docker
-
-## Адрес
-```https://valeryanichx.hopto.org```
 
 ## Как развернуть проект
 В этом проекте мы используем методику CI/CD, так что файл workflow триггерит на "push" в любую ветку репозитория и разворачивает проект на сервере.
