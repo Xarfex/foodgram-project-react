@@ -81,7 +81,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
     def validate(self, obj):
         user = obj['user']
         author = obj['author']
-        subscribed = user.subscribed_on.filter(author=author).exists()
+        subscribed = user.subscriber.filter(author=author).exists()
 
         if (
             self.context.get('request').method == 'POST'

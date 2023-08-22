@@ -104,7 +104,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         for ingredient in ingredients_data:
             if ingredient['id'] in ingredients_set:
                 raise serializers.ValidationError(
-                    'ИIngredient must be unique'
+                    'Ingredient must be unique'
                 )
             if ingredient['amount'] < 0:
                 raise serializers.ValidationError(
@@ -112,13 +112,20 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
                 )
             ingredients_set.add(ingredient['id'])
         recipe = Recipe.objects.create(**validated_data)
-        recipes_ingredients = []
+        # recipes_ingredients = []
+        # for ingredient in ingredients_data:
+        #     recipes_ingredients.append(
+        #         ingredient=Ingredients.objects.get(id=ingredient['id']),
+        #         recipe=recipe, amount=ingredient['amount']
+        #     )
+        # AddIngredientInRec.objects.bulk_create(recipes_ingredients)
         for ingredient in ingredients_data:
-            recipes_ingredients.append(
-                ingredient=Ingredients.objects.get(id=ingredient['id']),
-                recipe=recipe, amount=ingredient['amount']
+            amount = ingredient['amount']
+            id = ingredient['id']
+            AddIngredientInRec.objects.create(
+                ingredient=get_object_or_404(Ingredients, id=id),
+                recipe=recipe, amount=amount
             )
-        AddIngredientInRec.objects.bulk_create(recipes_ingredients)
         for tag in tags_data:
             recipe.tags.add(tag)
         return recipe

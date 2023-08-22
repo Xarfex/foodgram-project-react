@@ -1,11 +1,9 @@
 import json
 
 from django.core.management.base import BaseCommand
-from pathlib import Path
 
+from foodgram.settings import BASE_DIR
 from api.models import Ingredients
-
-BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent.parent
 
 
 class Command(BaseCommand):
